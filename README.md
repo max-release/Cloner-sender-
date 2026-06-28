@@ -22,12 +22,9 @@
 - [Built With](#built-with)
 - [What Is a Clone Sender Attack?](#what-is-a-clone-sender-attack)
 - [How Clone Phishing Works](#how-clone-phishing-works)
-- [Red Flags: How to Spot a Cloned Email](#red-flags-how-to-spot-a-cloned-email)
-- [Quick Checklist](#quick-checklist)
 - [Why Clone Phishing Works So Well](#why-clone-phishing-works-so-well)
 - [FAQ](#faq)
 - [Demo & Resources](#demo--resources)
-- [Disclaimer](#disclaimer)
 
 ## What Is a Clone Sender Attack?
 
