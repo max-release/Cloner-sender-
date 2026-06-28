@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clone Phishing & Clone Sender Attacks: Detection Guide</title>
+<meta name="description" content="Learn how clone phishing (the clone sender tactic) works, how attackers spoof trusted emails, and the red flags that help you spot a cloned email before you click.">
+<meta name="keywords" content="clone phishing, clone sender, email spoofing, phishing detection, lookalike domain, business email compromise">
+<meta property="og:title" content="Clone Phishing & Clone Sender Attacks: Detection Guide">
+<meta property="og:description" content="How attackers clone trusted emails — and the red flags that give them away.">
+<meta property="og:type" content="article">
+<link rel="canonical" href="https://example.com/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B1220;
+    --bg-panel:#101A2E;
+    --line:#22304A;
+    --ink:#E7ECF5;
+    --ink-dim:#8C9AB5;
+    --amber:#F2A93B;
+    --red:#E6584F;
+    --green:#3FBF8F;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.6;
+  }
+  .mono{font-family:'JetBrains Mono',monospace;}
+  a{color:var(--amber);}
+  .wrap{max-width:880px;margin:0 auto;padding:0 24px;}
+
+  /* HERO */
+  .hero{
+    border-bottom:1px solid var(--line);
+    padding:72px 0 56px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::before{
+    content:"";
+    position:absolute;
+    top:-40%;right:-10%;
+    width:480px;height:480px;
+    background:radial-gradient(circle, rgba(242,169,59,0.10), transparent 70%);
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--amber);
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:20px;
+  }
+  .eyebrow::before{content:"●";color:var(--red);font-size:10px;}
+  h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:clamp(34px,5vw,52px);
+    font-weight:700;
+    letter-spacing:-0.01em;
+    max-width:14ch;
+    margin-bottom:18px;
+  }
+  .lede{
+    color:var(--ink-dim);
+    font-size:18px;
+    max-width:54ch;
+    margin-bottom:28px;
+  }
+  .badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;}
+  .badge{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    padding:5px 10px;
+    border:1px solid var(--line);
+    border-radius:4px;
+    color:var(--ink-dim);
+  }
+
+  /* SECTION SCAFFOLD */
+  section{padding:56px 0;border-bottom:1px solid var(--line);}
+  .tag{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--ink-dim);
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    margin-bottom:10px;
+  }
+  h2{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:28px;
+    font-weight:700;
+    margin-bottom:18px;
+  }
+  p{color:var(--ink-dim);margin-bottom:14px;max-width:68ch;}
+  strong{color:var(--ink);}
+
+  /* COMPARISON SIGNATURE ELEMENT */
+  .compare{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+    margin:28px 0;
+  }
+  @media (max-width:640px){.compare{grid-template-columns:1fr;}}
+  .mail{background:var(--bg-panel);padding:20px;}
+  .mail-head{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:14px;
+  }
+  .mail-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;text-transform:uppercase;letter-spacing:.08em;
+  }
+  .mail.legit .mail-label{color:var(--green);}
+  .mail.clone .mail-label{color:var(--red);}
+  .mail-line{font-size:13px;color:var(--ink-dim);margin-bottom:6px;}
+  .mail-line b{color:var(--ink);font-weight:500;}
+  .hl{
+    background:rgba(230,88,79,0.18);
+    color:var(--red);
+    padding:0 4px;
+    border-radius:3px;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .mail-body{
+    font-size:13px;color:var(--ink-dim);
+    border-top:1px dashed var(--line);
+    padding-top:12px;margin-top:8px;
+  }
+
+  /* STEPS */
+  .steps{counter-reset:step;}
+  .step{
+    display:flex;gap:18px;
+    padding:18px 0;
+    border-top:1px solid var(--line);
+  }
+  .step:first-child{border-top:none;}
+  .step-num{
+    counter-increment:step;
+    font-family:'JetBrains Mono',monospace;
+    color:var(--amber);
+    font-weight:700;
+    min-width:28px;
+  }
+  .step-num::before{content: counter(step, decimal-leading-zero);}
+  .step h3{font-size:16px;font-weight:600;margin-bottom:4px;color:var(--ink);font-family:'Space Grotesk',sans-serif;}
+  .step p{margin-bottom:0;font-size:14px;}
+
+  /* TABLE */
+  table{width:100%;border-collapse:collapse;margin-top:8px;}
+  th,td{
+    text-align:left;padding:12px 10px;
+    border-bottom:1px solid var(--line);
+    font-size:14px;vertical-align:top;
+  }
+  th{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--amber);
+  }
+  td{color:var(--ink-dim);}
+  td b{color:var(--ink);}
+
+  /* CHECKLIST */
+  .checklist{list-style:none;}
+  .checklist li{
+    display:flex;gap:10px;align-items:flex-start;
+    padding:10px 0;border-top:1px solid var(--line);
+    font-size:14px;color:var(--ink-dim);
+  }
+  .checklist li:first-child{border-top:none;}
+  .checklist li::before{
+    content:"";
+    width:16px;height:16px;flex-shrink:0;margin-top:2px;
+    border:1px solid var(--amber);border-radius:3px;
+  }
+
+  /* FAQ */
+  details{
+    border-top:1px solid var(--line);
+    padding:16px 0;
+  }
+  details:first-of-type{border-top:none;}
+  summary{
+    cursor:pointer;font-weight:600;color:var(--ink);
+    font-family:'Space Grotesk',sans-serif;font-size:16px;
+    list-style:none;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  summary::-webkit-details-marker{display:none;}
+  summary::after{content:"+";color:var(--amber);font-size:20px;}
+  details[open] summary::after{content:"–";}
+  details p{margin-top:10px;margin-bottom:0;}
+
+  footer{padding:40px 0 60px;color:var(--ink-dim);font-size:13px;}
+  footer a{color:var(--ink-dim);}
+
+  :focus-visible{outline:2px solid var(--amber);outline-offset:2px;}
+  @media (prefers-reduced-motion: reduce){*{scroll-behavior:auto !important;}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow mono">Threat Pattern File · Email Security</div>
+    <h1>The email looked exactly right. That was the attack.</h1>
+    <p class="lede">A field guide to <strong>clone phishing</strong> — the "clone sender" tactic where attackers copy a real email you've already trusted, then quietly swap the link.</p>
+    <div class="badges mono">
+      <span class="badge">Clone Sender</span>
+      <span class="badge">Email Spoofing</span>
+      <span class="badge">Phishing Detection</span>
+    </div>
+  </div>
+</header>
+
+<section id="what">
+  <div class="wrap">
+    <div class="tag">01 — Definition</div>
+    <h2>What is a clone sender attack?</h2>
+    <p>A <strong>clone sender</strong> attack — also called <strong>clone phishing</strong> — is a tactic where an attacker impersonates a known contact or brand by copying a legitimate, previously received email and resending a near-identical replica. Usually only the links or attachments are swapped for malicious ones, while the layout, branding, and writing style stay exactly the same.</p>
+
+    <div class="compare">
+      <div class="mail legit">
+        <div class="mail-head"><span class="mail-label mono">Original</span></div>
+        <div class="mail-line">From: <b>billing@yourvendor.com</b></div>
+        <div class="mail-line">Subject: Invoice #4471</div>
+        <div class="mail-body">"Your invoice is attached. Pay via the usual portal link."</div>
+      </div>
+      <div class="mail clone">
+        <div class="mail-head"><span class="mail-label mono">Clone</span></div>
+        <div class="mail-line">From: <b>billing@<span class="hl">yourvend0r.com</span></b></div>
+        <div class="mail-line">Subject: Invoice #4471 <span class="hl">(corrected)</span></div>
+        <div class="mail-body">"There was an error on the attached invoice — use <span class="hl">this updated link</span> instead."</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="tag">02 — Mechanics</div>
+    <h2>How clone phishing works</h2>
+    <div class="steps">
+      <div class="step">
+        <span class="step-num mono"></span>
+        <div>
+          <h3>Interception</h3>
+          <p>The attacker compromises an email account or otherwise gains access to a real piece of correspondence.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num mono"></span>
+        <div>
+          <h3>Duplication</h3>
+          <p>They copy the exact layout, images, branding, and tone of a legitimate email — an invoice, a parcel tracking update, an internal IT memo.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num mono"></span>
+        <div>
+          <h3>Spoofing</h3>
+          <p>They alter the <code>From</code> address, display name, or <code>Reply-To</code> address so the message looks like it came from the original sender.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num mono"></span>
+        <div>
+          <h3>The hook</h3>
+          <p>The cloned message includes a pretext — "there was an error," "use this updated link" — to get the recipient to click or download without thinking twice.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="redflags">
+  <div class="wrap">
+    <div class="tag">03 — Detection</div>
+    <h2>Red flags: how to spot a cloned email</h2>
+    <table>
+      <tr><th>Check</th><th>What to do</th></tr>
+      <tr><td><b>Header / Reply-To</b></td><td>Inspect the actual email address, not just the display name.</td></tr>
+      <tr><td><b>Lookalike domains</b></td><td>Watch for subtle typos in the sender's domain, e.g. <code>support@microsoft-update.com</code> vs <code>support@microsoft.com</code>.</td></tr>
+      <tr><td><b>Hover test</b></td><td>Hover over links before clicking to preview the real destination URL.</td></tr>
+      <tr><td><b>Unexpected requests</b></td><td>Be suspicious of sudden requests for passwords or payment details. Verify through an independent channel.</td></tr>
+    </table>
+  </div>
+</section>
+
+<section id="checklist">
+  <div class="wrap">
+    <div class="tag">04 — Checklist</div>
+    <h2>Quick checklist</h2>
+    <ul class="checklist">
+      <li>Does the sender's actual address match the expected domain exactly?</li>
+      <li>Does the link preview (on hover) match the legitimate destination?</li>
+      <li>Is there unexplained urgency — "error," "revised," "act now"?</li>
+      <li>Is sensitive information being requested unexpectedly?</li>
+      <li>Can the request be verified independently before acting?</li>
+    </ul>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="tag">05 — FAQ</div>
+    <h2>Frequently asked questions</h2>
+
+    <details open>
+      <summary>What's the difference between clone phishing and regular phishing?</summary>
+      <p>Regular phishing emails are often generic. Clone phishing reuses a real, previously seen email almost exactly, which makes it harder to detect.</p>
+    </details>
+    <details>
+      <summary>What's the fastest way to check if a link is safe?</summary>
+      <p>Hover over the link without clicking to preview the actual destination URL, and compare it to the legitimate domain.</p>
+    </details>
+    <details>
+      <summary>Should I reply to a suspicious cloned email to verify it?</summary>
+      <p>No. Verify through a separate, independent channel — a phone call or a fresh message to a known-good address — not by replying to the suspicious email itself.</p>
+    </details>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+ 
